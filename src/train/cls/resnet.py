@@ -16,10 +16,10 @@ def cli_main():
     parser.add_argument("--augmentation", default=False, type=bool)
     parser.add_argument("--image_size", default=32, type=int)
     parser.add_argument("--batch_size", default=128, type=int)
-    parser.add_argument("--imb_factor", default=0.01, type=float)
+    parser.add_argument("--imb_factor", default=0.1, type=float)
     parser.add_argument("--balanced", default=False, type=bool)
     parser.add_argument("--retain_epoch_size", default=False, type=bool)
-    parser.add_argument('--learning_rate', type=float, default=0.1)
+    parser.add_argument('--learning_rate', type=float, default=0.01)
     parser.add_argument('--epoch', type=int, default=200)
 
 
@@ -51,7 +51,7 @@ def cli_main():
         mode='max',
     )
     logger = TensorBoardLogger(save_dir="tb_logs",
-                               name=f"resnet18_original_cifar10_{args.imb_factor}",
+                               name=f"resnet18_original_cifar10_{args.imb_factor}_{args.augmentation}_{args.balanced}",
                                default_hp_metric=False
                                )
     # logger.log_hyperparams
@@ -60,7 +60,7 @@ def cli_main():
                          callbacks=[checkpoint_callback],
                          strategy=DDPStrategy(find_unused_parameters=False),
                          accelerator='gpu',
-                         gpus=4,
+                         gpus=-1,
                          logger=logger
                          )
     trainer.fit(model, datamodule=dm)

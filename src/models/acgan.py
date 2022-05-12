@@ -240,7 +240,7 @@ def cli_main():
     parser = ArgumentParser()
     parser.add_argument("--augmentation", default=False, type=bool)
     parser.add_argument("--batch_size", default=128, type=int)
-    parser.add_argument("--imb_factor", default=0.01, type=float)
+    parser.add_argument("--imb_factor", default=0.1, type=float)
     parser.add_argument("--balanced", default=True, type=bool)
     parser.add_argument("--retain_epoch_size", default=False, type=bool)
     parser.add_argument('--epoch', type=int, default=200)

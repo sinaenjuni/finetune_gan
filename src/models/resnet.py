@@ -4,7 +4,7 @@ import torch.nn as nn
 from torch.optim.lr_scheduler import LambdaLR
 from torchmetrics.functional import confusion_matrix
 from torch.optim import SGD, Adam
-from models.base_models.resnet import resnet18, resnet34
+from models.modules.resnet import resnet18, resnet34
 
 import pytorch_lightning as pl
 

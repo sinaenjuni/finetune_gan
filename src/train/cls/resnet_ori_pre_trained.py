@@ -14,7 +14,7 @@ def cli_main():
     pl.seed_everything(1234)  # 다른 환경에서도 동일한 성능을 보장하기 위한 random seed 초기화
 
     parser = ArgumentParser()
-    parser.add_argument("--augmentation", default=False, type=bool)
+    parser.add_argument("--augmentation", default=True, type=bool)
     parser.add_argument("--image_size", default=32, type=int)
     parser.add_argument("--batch_size", default=128, type=int)
     parser.add_argument("--imb_factor", default=0.01, type=float)

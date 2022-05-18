@@ -22,9 +22,7 @@ def cli_main():
     parser.add_argument("--retain_epoch_size", default=False, type=bool)
     parser.add_argument('--learning_rate', type=float, default=0.1)
     parser.add_argument('--epoch', type=int, default=100)
-
     parser.add_argument('--target_model', type=int, default=99)
-    parser.add_argument('--gan_augmentation', type=bool, default=True)
 
 
     parser = Resnet_classifier.add_model_specific_args(parser)
@@ -49,43 +47,46 @@ def cli_main():
     # acgan = ACGAN.load_from_checkpoint(f"/home/sin/git/pytorch.GAN/src/lightning/models/tb_logs/acgan_cifar10_0.01_balancing/version_0/checkpoints/epoch={args.target_model}.ckpt")
     # acgan = ACGAN.load_from_checkpoint(f"/home/dblab/git/finetuning_gan/src/train/gan/tb_logs/acgan_cifar10_0.1_False_False/version_0/checkpoints/epoch={args.target_model}.ckpt")
     # acgan = ACGAN.load_from_checkpoint(f"/home/dblab/git/finetuning_gan/src/train/gan/tb_logs/acgan_cifar10_0.01_False_False/version_0/checkpoints/epoch={args.target_model}.ckpt")
-    acgan = ACGAN.load_from_checkpoint(f"/home/dblab/git/finetuning_gan/src/train/gan/tb_logs/acgan_cifar10_{args.imb_factor}_{args.gan_augmentation}_False/version_0/checkpoints/epoch={args.target_model}.ckpt")
 
-    model = Resnet_classifier(**vars(args))
+    ORI_PATH_100 = {
+        "T": "/home/dblab/git/finetuning_gan/src/train/cls/tb_logs/resnet18_original_cifar10_0.01_True_False/version_1/checkpoints/epoch=193-step=2522.ckpt",
+        "F": "/home/dblab/git/finetuning_gan/src/train/cls/tb_logs/resnet18_original_cifar10_0.01_False_False/version_1/checkpoints/epoch=183-step=2392.ckpt"
+    }
 
-    model.model.conv1 = acgan.D.conv1
-    model.model.layer1 = acgan.D.layer1
-    model.model.layer2 = acgan.D.layer2
-    model.model.layer3 = acgan.D.layer3
-    model.model.layer4 = acgan.D.layer4
-    model.model.fc = acgan.D.fc
+    FINE_PATH_100 = {
+        "TT": "/home/dblab/git/finetuning_gan/src/train/cls/tb_logs/resnet18_fine_cifar10_0.01_True_False-gen_True_False/version_1/checkpoints/epoch=99-step=1300.ckpt",
+        "TF": "/home/dblab/git/finetuning_gan/src/train/cls/tb_logs/resnet18_fine_cifar10_0.01_True_False-gen_False_False/version_1/checkpoints/epoch=43-step=572.ckpt",
+        "FT": "/home/dblab/git/finetuning_gan/src/train/cls/tb_logs/resnet18_fine_cifar10_0.01_False_False-gen_True_False/version_1/checkpoints/epoch=29-step=390.ckpt",
+        "FF": "/home/dblab/git/finetuning_gan/src/train/cls/tb_logs/resnet18_fine_cifar10_0.01_False_False-gen_False_False/version_1/checkpoints/epoch=98-step=1287.ckpt"
+    }
 
-    checkpoint_callback = pl.callbacks.ModelCheckpoint(
-        verbose=True,
-        # save_last=True,
-        save_top_k=1,
-        monitor='acc/val',
-        mode='max',
-    )
-    logger = TensorBoardLogger(save_dir="tb_logs",
-                               name=f"resnet18_fine_cifar10_{args.imb_factor}_{args.augmentation}_False-gen_{args.gan_augmentation}_False",
-                               # name="test",
-                               default_hp_metric=False
-                               )
-    logger.log_hyperparams
-    trainer = pl.Trainer(max_epochs=args.epoch,
-                         # callbacks=[EarlyStopping(monitor='val_loss')],
-                         callbacks=[checkpoint_callback],
-                         strategy=DDPStrategy(find_unused_parameters=False),
-                         accelerator='gpu',
-                         gpus=-1,
-                         logger=logger
-                         )
-    trainer.fit(model, datamodule=dm)
+    # FINE_PATH_10 = {
+    #
+    # }
 
-    result = trainer.test(model, dataloaders=dm.test_dataloader())
 
-    print(result)
+    model = Resnet_classifier.load_from_checkpoint(FINE_PATH_100["FF"])
+
+
+    # checkpoint_callback = pl.callbacks.ModelCheckpoint(filename="{epoch:d}_{loss/val:.4}_{acc/val:.4}",
+    #     verbose=True,
+    #     # save_last=True,
+    #     save_top_k=1,
+    #     monitor='acc/val',
+    #     mode='max',
+    # )
+    # logger = TensorBoardLogger(save_dir="tb_logs",
+    #                            name=f"resnet18_fine_cifar10_{args.imb_factor}_{args.augmentation}_{args.balanced}-gen_True_False",
+    #                            default_hp_metric=False
+    #                            )
+    # logger.log_hyperparams
+
+    trainer = pl.Trainer(accelerator='gpu',
+                         gpus=1)
+
+    result = trainer.test(model, dataloaders=dm)
+    for name, val in result[0].items():
+        print(f'{name}\t{val:.4}')
 
 
 

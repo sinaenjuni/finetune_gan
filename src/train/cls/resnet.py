@@ -18,8 +18,8 @@ def cli_main():
 
     parser = ArgumentParser()
     # data amount
-    parser.add_argument("--augmentation", default=True, type=bool)
-    parser.add_argument("--imb_factor", default=0.01, type=float)
+    parser.add_argument("--augmentation", default=False, type=bool)
+    parser.add_argument("--imb_factor", default=0.1, type=float)
     parser.add_argument("--balanced", default=False, type=bool)
     # parameters
     parser.add_argument("--image_size", default=32, type=int)
@@ -49,7 +49,8 @@ def cli_main():
 
     model = Resnet_classifier(**vars(args))
 
-    checkpoint_callback = pl.callbacks.ModelCheckpoint(filename="{epoch:d}_{loss/val:.4}_{acc/val:.4}",
+    checkpoint_callback = pl.callbacks.ModelCheckpoint(
+        # filename="{epoch:d}_{loss/val:.4}_{acc/val:.4}",
         verbose=True,
         # save_last=True,
         save_top_k=1,

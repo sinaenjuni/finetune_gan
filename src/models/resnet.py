@@ -93,13 +93,13 @@ class Resnet_classifier(pl.LightningModule):
         self.log_dict(metrics, logger=True)
 
 
-
     def test_step(self, batch, batch_idx):
         image, label = batch
         logit = self(image)
         loss = self.criterion(logit, label)
         pred = logit.argmax(-1)
         return {"loss": loss, "pred": pred, "label": label}
+
 
     def test_epoch_end(self, output):
         loss = torch.stack([x['loss'] for x in output]).mean()

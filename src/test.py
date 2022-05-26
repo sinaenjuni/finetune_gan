@@ -30,6 +30,7 @@ PATH10 = {
     "/home/dblab/git/finetuning_gan/src/train/cls/tb_logs/resnet18_fine_cifar10_0.1_True_False-gen_True_False/version_0/events.out.tfevents.1652689670.ckserver.19687.0"
 }
 
+
 PATH100 = {
     "ORI_False":
         "/home/dblab/git/finetuning_gan/src/train/cls/tb_logs/resnet18_original_cifar10_0.01_False_False/version_0/events.out.tfevents.1652421829.ckserver.19084.0",
